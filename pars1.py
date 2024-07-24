@@ -5,23 +5,24 @@ from pprint import pprint
 
 from bs4 import BeautifulSoup
 import requests
-
+# Определение функции get_html(url) для получения HTML-кода страницы по URL.
 def get_html (url):
     r= requests.get(url)
     return r.text
-
+# Определение функции get_soup(html) для создания объекта BeautifulSoup из HTML-кода.
 def get_soup(html):
     soup= BeautifulSoup(html,'lxml')
     return soup
+ # Определение функции save_html_file(text, name_file) для сохранения HTML-кода в файл.   
 def save_html_file (text,name_file):
     with open(name_file,'w',encoding='utf-8') as html_file:
         html_file.write(text)
-
+# Определение функции open_html_file(name_file) для открытия файла с HTML-кодом.
 def open_html_file(name_file):
     with open(name_file,'r',encoding='utf-8') as html_file:
         return html_file.read()
 
-
+# Определение функции write_rows_csv(list_of_dict_sportsmens) для записи данных в CSV-файл.
 def write_rows_csv (list_of_dict_sportsmens):
     with open('table.csv','a',newline='') as f:
         header_list=list(list_of_dict_sportsmens[0].keys())
@@ -29,16 +30,18 @@ def write_rows_csv (list_of_dict_sportsmens):
         writer.writeheader()
         for sportsmen_dict in list_of_dict_sportsmens:
             writer.writerow(sportsmen_dict)
+# Определение функции RowHandler(tag) для обработки строки таблицы и извлечения данных.          
 def RowHandler (tag):
     eng_name,ru_name=tag.find('a').text.strip().split(' | ')
     href=tag.find('a').get('href')
     return (eng_name,ru_name,href)
+# Определение функции saveFile(*args) для сохранения данных в текстовый файл.  
 def saveFile(*args):
     with open ('text.txt','a') as f:
         f.write(' '.join(*args)[:-1] )
 
 
-
+#  основная логика программы.
 def main():
     url ='https://allskaters.info/skaters/rus/'
     name_file='main.html'
@@ -47,9 +50,7 @@ def main():
     if not file_exists:save_html_file(html_text,name_file)
     soup_html= get_soup(html_text)
 
-
     table_sports =soup_html.find('table',id='tablepress-25058')
-
 
     p = re.compile("column-1")
     all_sprotsmens=  table_sports.findAll('td',class_=p)
@@ -83,9 +84,6 @@ def main():
             dictSportsems.update({'region':region})
         except Exception as e:
             list_exception_sportsmens.append((i+1,dictSportsems['ru_name'],e, 'region'))
-
-
-
         finally:
             print(i+1, dictSportsems['ru_name'])
             list_of_dict_sportsmens.append(dict.copy(dictSportsems))
@@ -97,6 +95,6 @@ def main():
 
 
 
-
+# точка входа в код
 if __name__=='__main__':
     main()
